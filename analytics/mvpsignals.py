@@ -18,7 +18,7 @@ Created on Nov 2, 2018
 '''
 
 import settings as S
-from mvpchart import jsonPlotSynopsis
+from analytics.mvpchart import jsonPlotSynopsis
 from common import loadCfg, retrieveCounters, formStocklist, loadKlseCounters
 from utils.dateutils import getBusDaysBtwnDates, pdDaysOffset
 from utils.fileutils import grepN, loadfromjson, jsonLastDate, wc_line_count
