@@ -1573,22 +1573,22 @@ def extractSignals(counter, sdict, xpn):
             return 0, 0, 0, 0, 0, 0
         mvalP = \
             1 if plistM[-1] <= 5 else \
-            2 if plistM[-2] <= 5 else 0
+            2 if len(plistM) > 1 and plistM[-2] <= 5 else 0
         pvalP = \
             1 if plistP[-1] <= 0 else \
-            2 if plistP[-2] <= 0 else 0
+            2 if len(plistP) > 1 and plistP[-2] <= 0 else 0
         vvalP = \
             1 if plistV[-1] <= 0 else \
-            2 if plistV[-2] <= 0 else 0
+            2 if len(plistV) > 1 and plistV[-2] <= 0 else 0
         mvalN = \
             1 if nlistM[-1] >= 10 else \
-            2 if nlistM[-2] >= 10 else 0
+            2 if len(plistM) > 1 and nlistM[-2] >= 10 else 0
         pvalN = \
             1 if nlistP[-1] > 0 else \
-            2 if nlistP[-2] > 0 else 0
+            2 if len(plistP) > 1 and nlistP[-2] > 0 else 0
         vvalN = \
             1 if nlistV[-1] > 0 else \
-            2 if nlistV[-2] > 0 else 0
+            2 if len(plistV) > 1 and nlistV[-2] > 0 else 0
         return mvalP, pvalP, vvalP, mvalN, pvalN, vvalN
 
     def evalLowC2(sval):
@@ -2440,7 +2440,7 @@ def extractSignals(counter, sdict, xpn):
                         else:
                             # 2018-07-10 PARAMON
                             sig, state = sval9, st + 2
-            if prevbottomP:
+            elif prevbottomP:
                 if plistP[-1] < 0:
                     if nlistM[-1] > min(nlistM[-3:]):
                         if min(nlistM[-3:]) > 5:
@@ -3376,9 +3376,12 @@ def extractSignals(counter, sdict, xpn):
                     elif max(plistM[-3:]) < 10:
                         # 2018-07-02 PADINI
                         sig, state = -sval3, 6
-                    else:
+                    elif isprev3bottomM() or isprev3topP():
                         # 2014-06-23 KESM
                         sig, state = sval3, -6
+                    else:
+                        # 2013-05-02 AXREIT
+                        sig, state = -sval3, -6
             elif isprev3topV():
                 if plistM[-1] == min(plistM[-3:]):
                     if nlistP[-1] == min(nlistP[-3:]):
@@ -4047,6 +4050,7 @@ def extractSignals(counter, sdict, xpn):
                     if nlistP[-1] > 0:
                         if min(nlistM[-3:]) > 5:
                             # 2013-11-29 KESM
+                            # 2019-03-12 DANCO
                             sig, state = sval4, -30
             elif nlistP[-1] == min(nlistP[-3:]):
                 pass
