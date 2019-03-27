@@ -966,7 +966,7 @@ def extractSignals(counter, sdict, xpn):
             def lowHighP():
                 if not mpInSync:
                     return False
-                if len(nlistM) < 3 or len(nlistP) < 3:
+                if len(nlistM) < 4 or len(nlistP) < 3:
                     return False
                 if nlistP[-2] < nlistP[-1] and nlistP[-2] < nlistP[-3] and \
                     nlistM[-2] > nlistM[-1] and (nlistM[-2] > nlistM[-3] or
@@ -1582,13 +1582,13 @@ def extractSignals(counter, sdict, xpn):
             2 if len(plistV) > 1 and plistV[-2] <= 0 else 0
         mvalN = \
             1 if nlistM[-1] >= 10 else \
-            2 if len(plistM) > 1 and nlistM[-2] >= 10 else 0
+            2 if len(nlistM) > 1 and nlistM[-2] >= 10 else 0
         pvalN = \
             1 if nlistP[-1] > 0 else \
-            2 if len(plistP) > 1 and nlistP[-2] > 0 else 0
+            2 if len(nlistP) > 1 and nlistP[-2] > 0 else 0
         vvalN = \
             1 if nlistV[-1] > 0 else \
-            2 if len(plistV) > 1 and nlistV[-2] > 0 else 0
+            2 if len(nlistV) > 1 and nlistV[-2] > 0 else 0
         return mvalP, pvalP, vvalP, mvalN, pvalN, vvalN
 
     def evalLowC2(sval):
@@ -4394,6 +4394,21 @@ def extractSignals(counter, sdict, xpn):
                                 if min(nlistP[-3:]) > 0:
                                     # 2012-08-01 N2N
                                     sig, state = sval, -18
+        if not sig:
+            if newlowC and nlistV[-1] == max(nlistV[-3:]):
+                if mvalley and nlistM[-1] == max(nlistM[-3:]):
+                    if pvalley and nlistP[-1] == max(nlistP[-3:]):
+                        if nlistM[-1] > min(plistM[-3:]):
+                            if nlistP[-1] > min(plistP[-3:]):
+                                # 2014-04-16 DUFU newlowC, newhighM
+                                # intercepted by 2014-03-06 DUFU
+                                sig, state = sval, 20
+        if not sig:
+            if newhighV:
+                if newlowC:
+                    if max(nlistV[-3:]) < 0:
+                        # 2018-07-20 DUFU
+                        sig, state = sval, 22
         return sig, state
 
     lastTrxn, cmpvlists, composelist, hstlist, div = \
@@ -4462,7 +4477,7 @@ def extractSignals(counter, sdict, xpn):
     busdays = abs(getBusDaysBtwnDates(firstDate, lastDate))
     if plistM is None or plistP is None or nlistM is None or nlistP is None:
         nosignal = True
-    elif (len(nlistP) < 5 or len(plistP) < 5) and busdays < 345:
+    elif (len(nlistP) < 3 or len(plistP) < 3) and busdays < 345:
         print "%s:Insufficient data:%s,%s,%d,%d,%d" % (counter, firstDate, lastDate,
                                                        busdays, len(nlistP), len(plistP))
         nosignal = True
@@ -4484,8 +4499,8 @@ def extractSignals(counter, sdict, xpn):
         # negstr = "".join(neglist)
         # posstr = "".join(poslist)
         ssig, sstate = evalExtremes(90)
-        if ssig:
-            pass
+        if ssig or 1 == 1:
+            mia = 90
         elif newlowC:
             ssig, sstate = evalLowC2(10)
             if not ssig:
@@ -4562,8 +4577,7 @@ def extractSignals(counter, sdict, xpn):
                     if not ssig and not mia:
                         mia = 60
         if not ssig:
-            if posV in [0, 4] or bottomV or topV or prevbottomV or prevtopV or \
-                    isprev3topV() or isprev3bottomV():
+            if posV in [0, 4] or bottomV or topV:
                 if not mia:
                     mia = 79
                 else:
