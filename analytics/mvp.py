@@ -243,7 +243,10 @@ def load_mvp_args(synopsis=False, ohlc=False):
 
 
 def mvpUpdateMPV(counter, scode):
-    inputfl = S.DATA_DIR + counter + "." + scode + ".csv"
+    if scode == 0:
+        inputfl = S.DATA_DIR + counter + '.csv'
+    else:
+        inputfl = S.DATA_DIR + counter + "." + scode + ".csv"
     lastdt = getLastDate(inputfl)
     fname = S.DATA_DIR + S.MVP_DIR + counter
     csvfl = fname + ".csv"
