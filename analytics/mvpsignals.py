@@ -236,7 +236,7 @@ def extractSignals(counter, sdict, xpn):
 
     def isprev3topM():
         if mvalley:
-            if max(plistM[-3:]) == max(plistM):
+            if max(plistM[-3:-1]) == max(plistM):
                 return True
         else:
             if max(plistM[-3:-1]) == max(plistM[:-1]):
@@ -245,7 +245,7 @@ def extractSignals(counter, sdict, xpn):
 
     def isprev3topP():
         if pvalley:
-            if max(plistP[-3:]) == max(plistP):
+            if max(plistP[-3:-1]) == max(plistP):
                 return True
         else:
             if max(plistP[-3:-1]) == max(plistP[:-1]):
@@ -254,7 +254,7 @@ def extractSignals(counter, sdict, xpn):
 
     def isprev3topV():
         if vvalley:
-            if max(plistV[-3:]) == max(plistV):
+            if max(plistV[-3:-1]) == max(plistV):
                 return True
         else:
             if max(plistV[-3:-1]) == max(plistV[:-1]):
@@ -263,7 +263,7 @@ def extractSignals(counter, sdict, xpn):
 
     def isprev3bottomM():
         if mpeak:
-            if min(nlistM[-3:]) == min(nlistM):
+            if min(nlistM[-3:-1]) == min(nlistM):
                 return True
         else:
             if min(nlistM[-3:-1]) == min(nlistM[:-1]):
@@ -272,7 +272,7 @@ def extractSignals(counter, sdict, xpn):
 
     def isprev3bottomP():
         if ppeak:
-            if min(nlistP[-3:]) == min(nlistP):
+            if min(nlistP[-3:-1]) == min(nlistP):
                 return True
         else:
             if min(nlistP[-3:-1]) == min(nlistP[:-1]):
@@ -281,7 +281,7 @@ def extractSignals(counter, sdict, xpn):
 
     def isprev3bottomV():
         if vpeak:
-            if min(nlistV[-3:]) == min(nlistV):
+            if min(nlistV[-3:-1]) == min(nlistV):
                 return True
         else:
             if min(nlistV[-3:-1]) == min(nlistV[:-1]):
@@ -4248,6 +4248,7 @@ def extractSignals(counter, sdict, xpn):
             if newlowM and newlowP and newlowV:
                 if topP and topV:
                     if isprev3bottomM():
+                        # 2014-06-03 ARANK
                         # 2018-07-02 KLSE
                         sig, state = sval, 2
         if not sig:
@@ -4678,116 +4679,232 @@ def extractSignals(counter, sdict, xpn):
 
     def evalVol(sval, mia):
         def evalHighV():
-            sig, state = 0, 0
-            if bottomM:
+            def evalLowBottomM(sval):
+                sig, state = 0, 0
                 if newlowP:
-                    if nlistM[-1] < 5:
-                        if plistP[-1] == min(plistP[-3:]):
-                            # 2017-12-20 DUFU plistP[-1] < 0
-                            sig, state = sval, 1
+                    if max(plistM[-3:]) < 10:
+                        if nlistM[-1] < 5:
+                            if plistP[-1] == min(plistP[-3:]):
+                                if nlistP[-1] < 0:
+                                    # 2017-12-07 DUFU plistP[-1] < 0, prevbottomM, newlowM
+                                    # 2017-12-20 DUFU plistP[-1] < 0
+                                    sig, state = sval, 1
                 elif bottomP:
-                    if not (newhighM or newhighP):
-                        if max(plistM[-3:]) > 10:
-                            if nlistP[-1] > 0:
-                                # 2014-11-24 DUFU
-                                sig, state = -sval, 5
+                    if newhighM:
+                        pass
+                    elif newhighP:
+                        pass
+                    elif bottomM:
+                        if nlistM[-1] > 5:
+                            if max(plistM[-3:]) >= 10:
+                                if nlistP[-1] >= 0:
+                                    # 2014-11-24 DUFU
+                                    sig, state = -sval, 10
+                                else:
+                                    # 2013-05-13 ARANK
+                                    sig, state = sval, 10
+                            elif nlistP[-1] < 0:
+                                # 2011-11-02 FAVCO
+                                sig, state = sval, 15
                             else:
-                                # 2013-05-13 ARANK
-                                sig, state = sval, 5
-                        else:
-                            # 2011-11-02 FAVCO
-                            sig, state = sval, 7
-            elif newlowM:
-                if newlowP:
-                    if prevbottomM:
-                        if plistP[-1] == min(plistP[-3:]):
-                            # 2017-12-07 DUFU plistP[-1] < 0
-                            sig, state = sval, 10
-            elif newhighP or topP:
-                if newhighM:
+                                sig, state = -sval, 99
+                elif prevtopP:
+                    if max(plistM[-3:]) >= 10:
+                        if nlistM[-1] >= 5:
+                            if prevtopP:
+                                if nlistP[-1] == max(nlistP[-3:]):
+                                    if nlistP[-1] < 0:
+                                        # 2016-05-09 ARANK
+                                        sig, state = sval, 30
+                return sig, state
+
+            def evalHighTopP(sval):
+                sig, state = 0, 0
+                if newhighM or topM:
                     if isprev3bottomM():
                         if isprev3bottomP():
-                            # 2018-08-03 DUFU
-                            sig, state = sval, 20
+                            if max(plistM[-3:]) < 10:
+                                if nlistM[-1] >= 5:
+                                    if nlistP[-1] < 0:
+                                        # 2018-08-03 DUFU
+                                        sig, state = sval, 1
+                            elif min(nlistM[-3:]) >= 5:
+                                if min(nlistP[-3:]) >= 0:
+                                    if plistP[-1] == min(plistP[-3:]):
+                                        # 2013-10-10 DUFU
+                                        sig, state = -sval, 1
                     elif nlistM[-1] == max(nlistM[-3:]):
                         if bottomP or nlistP[-1] < 0:
-                            # 2019-03-01 FAVCO
-                            sig, state = -sval, 33
+                            if max(plistM[-3:]) >= 10 or \
+                                    plistP[-1] == min(plistP[-3:]) or plistP[-1] <= 0:
+                                # 2015-11-03 ARANK
+                                sig, state = sval, 5
+                            else:
+                                # 2019-03-01 FAVCO
+                                sig, state = -sval, 5
                 elif isprev3topM():
                     if isprev3topP():
-                        if nlistM[-1] == max(nlistM[-3:]):
-                            if nlistP[-1] == max(nlistP[-3:]):
-                                if max(plistM[-3:]) > 10:
-                                    if min(nlistP[-3:]) > 0:
+                        if max(plistM[-3:]) >= 10:
+                            if nlistM[-1] == max(nlistM[-3:]):
+                                if nlistP[-1] == max(nlistP[-3:]):
+                                    if min(nlistP[-3:]) >= 0:
                                         # 2019-01-02 CARIMIN
-                                        sig, state = sval, 30
-                        elif max(plistM) < 10:
+                                        sig, state = sval, 10
+                            elif min(nlistM[-3:]) >= 5:
+                                if plistM[-1] == min(plistM[-3:]):
+                                    if plistP[-1] < plistP[-2]:
+                                        if nlistP[-1] < nlistP[-2]:
+                                            if nlistP[-1] < 0:
+                                                # 2014-04-22 ARANK
+                                                sig, state = -sval, 15
+                        elif isprev3bottomM():
+                            pass
+                        elif isprev3bottomP():
+                            pass
+                        elif min(nlistM[-3:]) >= 5:
                             if nlistM[-1] > nlistM[-2]:
-                                if nlistP[-1] > nlistP[-2]:
+                                if nlistP[-1] == max(nlistP[-3:]):
                                     # 2017-03-01 DUFU
-                                    sig, state = sval, 35
+                                    sig, state = sval, 30
                 elif nlistM[-3] == min(nlistM) and nlistM[-1] == max(nlistM[-3:]):
                     if nlistP[-3] == min(nlistP) and nlistP[-1] == max(nlistP[-3:]):
                         # if prevtopC and newhighC:
                         # 2015-12-29 DUFU
-                        sig, state = -sval, -37
-            elif prevtopP:
+                        sig, state = -sval, -50
+                return sig, state
+
+            def evalPrevtopP(sval):
+                sig, state = 0, 0
                 if prevtopV:
                     if plistM[-1] == min(plistM[-3:]) and nlistM[-1] == max(nlistM[-3:]):
                         if pvalley and nlistP[-1] < nlistP[-2]:
                             # 2017-05-02 DUFU bottomV
-                            sig, state = -sval, -40
+                            sig, state = -sval, -1
+                return sig, state
+
+            def evalLowBottomP(sval):
+                sig, state = 0, 0
+                if topM:
+                    if plistM[-1] > 10:
+                        if min(nlistM[-3:]) >= 5:
+                            if nlistP[-1] < 0:
+                                # 2012-05-04 DUFU
+                                sig, state = -sval, 1
+                elif max(plistM[-3:]) >= 10:
+                    if min(nlistM[-3:]) >= 5:
+                        if nlistP[-1] < 0:
+                            # 2014-04-04 ARANK
+                            sig, state = sval, 5
+                return sig, state
+
+            def evalHighTopM(sval):
+                sig, state = 0, 0
+                if plistM[-1] >= 10:
+                    if min(nlistM[-3:]) >= 5:
+                        if min(nlistP[-3:]) >= 0:
+                            if plistP[-1] == min(plistP[-3:]):
+                                # 2013-10-02 DUFU
+                                sig, state = -sval, 1
+                return sig, state
+
+            sig, state = 0, 0
+            if newlowM or bottomM:
+                sig, state = evalLowBottomM(sval + 1)
+            elif newhighP or topP:
+                sig, state = evalHighTopP(sval + 2)
+            elif prevtopP:
+                sig, state = evalPrevtopP(sval + 3)
+            elif bottomP:
+                sig, state = evalLowBottomP(sval + 4)
+            elif newhighM or topM:
+                sig, state = evalHighTopM(sval + 5)
             else:
                 if max(nlistV[-3:]) < 0:
                     if nlistM[-1] == max(nlistM[-3:]):
                         if isprev3bottomP():
                             if prevtopM:
-                                if plistM[-1] > 10:
+                                if plistM[-1] >= 10:
                                     if nlistP[-1] == max(nlistP[-3:]):
                                         if plistP[-1] < plistP[-2]:
                                             # 2012-10-29 ARANK newhighC, prevtopV
-                                            sig, state = -sval, 80
+                                            sig, state = -sval, 1
                             elif plistM[-1] > plistM[-2]:
                                 if plistP[-1] > min(plistP[-3:]):
                                     # 2018-07-18 DUFU newlowC
-                                    sig, state = sval, 80
+                                    sig, state = sval, 5
+                elif nlistV[-1] > 0:
+                    if plistM[-1] == min(plistM[-3:]):
+                        if min(nlistM[-3:]) > 5:
+                            if nlistP[-1] > 0:
+                                # 2012-10-01 DUFU
+                                sig, state = -sval, 10
             return sig, state
 
         def evalLowV():
-            sig, state = 0, 0
-            if topP:
+            def evalHighTopP(sval):
+                sig, state = 0, 0
                 if topV:
-                    if mvalley and nlistM[-1] == max(nlistM[-3:]):
+                    if max(plistM[-3:]) >= 10:
+                        if min(nlistM[-3:]) >= 5:
+                            if nlistP[-1] < 0:
+                                # 2015-12-01 ARANK newlowM
+                                # 2016-02-03 ARANK
+                                sig, state = sval, 1
+                    elif mvalley and nlistM[-1] == max(nlistM[-3:]):
                         if nlistP[-1] == max(nlistP[-3:]):
                             # 2017-04-18 DUFU newhighC
-                            sig, state = sval, 1
+                            sig, state = sval, 5
+                elif bottomM:
+                    if prevtopM:
+                        if plistM[-1] < 10:
+                            if nlistM[-1] >= 5:
+                                if nlistP[-1] == max(nlistP[-3:]):
+                                    if nlistP[-1] < 0:
+                                        # 2018-11-01 ARANK
+                                        sig, state = -sval, 20
                 elif prevbottomM:
-                    if nlistM[-1] > 5:
+                    if nlistM[-1] >= 5:
                         if newlowP:
                             # 2015-03-04 DUFU
-                            sig, state = sval, 10
+                            sig, state = sval, 30
                         else:
                             # 2015-03-16 DUFU
                             # 2016-02-03 ARANK topV
-                            sig, state = sval, 12
-                elif not (newlowP or newlowM):
+                            sig, state = sval, 32
+                elif newlowM:
+                    if max(plistM[-3:]) < 10:
+                        if min(nlistM[-3:]) > 5:
+                            if nlistP[-1] >= 0:
+                                # 2011-12-20 DUFU
+                                sig, state = -sval, 40
+                elif newlowP:
+                    pass
+                else:
                     if nlistM[-1] == max(nlistM[-3:]):
                         if nlistP[-1] == max(nlistP[-3:]):
                             # 2014-06-09 DUFU bottomC
-                            sig, state = sval, 15
-            elif newlowM:
+                            sig, state = sval, 60
+                return sig, state
+
+            def evalLowBottomM(sval):
+                sig, state = 0, 0
                 if newlowP:
                     if prevbottomP:
                         if mpeak and nlistM[-1] == min(nlistM[-3:]):
                             if ppeak and nlistP[-1] == min(nlistP[-3:]):
                                 # 2017-10-03 DUFU mia==30 (retrace)
-                                sig, state = -sval, 20
+                                sig, state = -sval, 1
                 elif prevbottomM:
-                    if isprev3topP() and plistP[-1] < plistP[-2]:
-                        # 2015-05-05 DUFU
-                        sig, state = -sval, 22
-            elif bottomM:
-                if isprev3topP() and plistP[-1] < plistP[-2]:
+                    if isprev3topP():
+                        if plistP[-1] < plistP[-2]:
+                            # 2015-05-05 DUFU
+                            sig, state = -sval, 10
+                        elif nlistM[-1] >= 5:
+                            if nlistP[-1] >= 0:
+                                # 2014-10-01 ARANK
+                                sig, state = -sval, 15
+            # elif bottomM:
+                elif isprev3topP() and plistP[-1] < plistP[-2]:
                     if bottomP:
                         # 2015-08-05 DUFU
                         sig, state = sval, -30
@@ -4799,50 +4916,106 @@ def extractSignals(counter, sdict, xpn):
                         if nlistM[-1] < 5:
                             if nlistP[-1] < 0:
                                 # 2016-04-01 DUFU
-                                sig, state = sval, 35
-            elif topM:
-                if nlistM[-2] == min(nlistM):
-                    if nlistP[-2] == min(nlistP):
-                        if nlistP[-1] > 0:
-                            # 2016-10-04 DUFU
-                            sig, state = sval, 40
-            elif newhighM:
+                                sig, state = sval, 40
+                return sig, state
+
+            def evalHighTopM(sval):
+                sig, state = 0, 0
                 if bottomP:
                     if prevtopP:
                         if nlistM[-1] == min(nlistM[-3:]):
-                            if nlistM[-1] > 5:
+                            if nlistM[-1] >= 5:
                                 if nlistP[-1] < 0:
                                     # 2012-07-03 ARANK
-                                    sig, state = sval, 45
-            elif prevtopM:
+                                    sig, state = sval, 1
+                elif prevbottomP:
+                    if min(nlistM[-3:]) >= 5:
+                        if nlistP[-1] >= 0:
+                            if plistP[-1] == min(plistP[-3:]):
+                                # 2013-09-02 DUFU
+                                sig, state = -sval, 5
+                else:
+                    if max(plistM[-3:]) < 10:
+                        if nlistM[-2] == min(nlistM):
+                            if nlistP[-2] == min(nlistP):
+                                if nlistP[-1] >= 0:
+                                    # 2016-10-04 DUFU
+                                    sig, state = sval, 10
+                return sig, state
+
+            def evalPrevtopM(sval):
+                sig, state = 0, 0
                 if isprev3bottomM:
                     if isprev3bottomP:
                         if plistV[-1] < 0:
                             if newlowP:
                                 # 2016-11-03 DUFU (6 months bull run)
-                                sig, state = sval, 50
+                                sig, state = sval, 1
                             else:
                                 # 2012-07-03 ARANK newhighM
                                 # 2016-11-01 DUFU
                                 # 2016-11-11 DUFU
-                                sig, state = sval, 51
+                                sig, state = sval, 2
+                        elif plistP[-1] < plistP[-2]:
+                            if plistM[-1] >= 10:
+                                if nlistM[-1] >= 5:
+                                    # 2014-01-02 ARANK
+                                    sig, state = sval, 5
+                return sig, state
+
+            def evalPrevbottomM(sval):
+                sig, state = 0, 0
+                if prevbottomP:
+                    if plistM[-1] == min(plistM[-3:]):
+                        if nlistM[-1] >= 5:
+                            if plistP[-1] == min(plistP[-3:]):
+                                if nlistP[-1] < 0:
+                                    # 2019-03-19 DUFU
+                                    sig, state = sval, 1
+                return sig, state
+
+            sig, state = 0, 0
+            if topP:
+                sig, state = evalHighTopP(sval + 1)
+            elif newlowM or bottomM:
+                sig, state = evalLowBottomM(sval + 2)
+            elif newhighM or topM:
+                sig, state = evalHighTopM(sval + 3)
+            elif prevtopM:
+                sig, state = evalPrevtopM(sval + 4)
+            elif prevbottomM:
+                sig, state = evalPrevbottomM(sval + 5)
             else:
-                if nlistM[-2] == min(nlistM):
+                if max(plistM[-3:]) >= 10:
+                    if min(nlistM[-3:]) >= 5:
+                        if plenP > 2 and plistP[-1] == min(plistP[-3:]):
+                            if isprev3bottomP():
+                                if nlistP[-1] < 0:
+                                    # 2014-03-03 ARANK
+                                    # 2015-09-04 ARANK
+                                    sig, state = sval, 1
+                elif nlistM[-2] == min(nlistM):
                     if nlistP[-2] == min(nlistP):
                         if mpeak:
                             if pvalley:
                                 # 2018-05-03 DUFU newlowC
-                                sig, state = sval, -80
+                                sig, state = sval, -5
                             else:
                                 # 2017-10-13 ARANK mia30
-                                sig, state = -sval, 80
+                                sig, state = -sval, 5
             return sig, state
 
         def evalTopV():
             sig, state = 0, 0
             # if newhighC:
             if topP:
-                if plistM[-1] < plistM[-2]:
+                if topM:
+                    if plistM[-1] < 10:
+                        if nlistM[-1] >= 5:
+                            if nlistP[-1] < 0:
+                                # 2018-09-04 DUFU
+                                sig, state = sval, 1
+                elif plistM[-1] < plistM[-2]:
                     if mpeak and nlistM[-1] > nlistM[-2]:
                         if nlistP[-1] == max(nlistP[-3:]):
                             # 2017-04-04 DUFU
@@ -4850,43 +5023,127 @@ def extractSignals(counter, sdict, xpn):
                     elif mvalley and nlistM[-1] == max(nlistM[-3:]):
                         if nlistP[-1] == max(nlistP[-3:]):
                             # 2017-04-10 DUFU
-                            sig, state = sval, 1
+                            sig, state = sval, 5
             # elif prevtopC or (plenC > 1 and plistC[-2] == max(plistC)):
-            elif bottomP or prevbottomP:
+            elif bottomP:
                 if prevbottomM:
-                    if newlowM:
-                        # 2014-12-16 DUFU
-                        sig, state = sval, 10
-                    else:
-                        # 2014-12-12 DUFU
-                        sig, state = sval, -10
-                elif bottomM:
-                    if prevbottomP:
-                        # 2015-01-05 DUFU
-                        sig, state = sval, 15
+                    if nlistM[-1] >= 5:
+                        if nlistP[-1] > 0:
+                            if newlowM:
+                                # 2014-12-16 DUFU
+                                sig, state = sval, 10
+                            else:
+                                # 2014-12-12 DUFU
+                                sig, state = sval, -10
+            elif bottomM:
+                if prevbottomP or nlistP[-2] == min(nlistP):
+                    if nlistM[-1] >= 5:
+                        if nlistP[-1] > 0:
+                            # 2015-01-05 DUFU
+                            sig, state = sval, 15
+                elif prevtopP:
+                    if pvalley and nlistP[-1] == min(nlistP[-3:]):
+                        if nlistV[-1] == max(nlistV[-3:]):
+                            # 2016-04-15 DUFU
+                            sig, state = sval, 20
+                elif plistP[-1] == max(plistP[-3:]):
+                    if nlistM[-1] < 5:
+                        if max(plistM[-3:]) < 10:
+                            if nlistP[-1] == max(nlistP[-3:]):
+                                if nlistP[-1] >= 0:
+                                    # 2016-03-02 DUFU
+                                    sig, state = sval, -1
             return sig, state
 
         def evalBottomV():
-            sig, state = 0, 0
-            if newhighM:
+            def evalHighTopM(sval):
+                sig, state = 0, 0
                 if bottomM:
                     if bottomP:
-                        if nlistM[-1] > 5:
+                        if nlistM[-1] >= 5:
                             if nlistP[-1] < 0:
                                 # 2012-07-31 ARANK
                                 sig, state = sval, 1
-            # if topC:
-            elif bottomP:
+                return sig, state
+
+            def evalLowBottomP(sval):
+                sig, state = 0, 0
                 if bottomM or prevbottomM:
                     if nlistM[-1] < 5 and nlistP[-1] < 0:
-                        # 2015-07-16 DUFU
-                        sig, state = sval, -10
+                        if max(plistM[-3:]) >= 10:
+                            # 2015-07-16 DUFU
+                            sig, state = sval, -1
+                        else:
+                            # 2014-11-04 ARANK
+                            sig, state = -sval, 1
                     elif newhighM or prevtopP or (prevtopM and plistM[-1] < 10):
                         # 2012-07-31 ARANK
                         sig, state = sval, 10
-                    else:
-                        # 2015-06-02 DUFU
-                        sig, state = -sval, 10
+                    elif prevtopM:
+                        if plistM[-1] >= 10:
+                            if nlistP[-1] == min(nlistP[-3:]):
+                                # 2015-06-02 DUFU
+                                sig, state = -sval, 20
+                    elif max(plistM[-3:]) >= 10:
+                        if min(nlistM[-3:]) >= 5:
+                            if min(nlistP[-3:]) >= 0:
+                                # 2015-06-16 DUFU
+                                sig, state = -sval, 30
+                return sig, state
+
+            def evalLowBottomM(sval):
+                sig, state = 0, 0
+                if max(plistM[-3:]) >= 10:
+                    if nlistM[-1] >= 5:
+                        if prevtopP:
+                            if nlistP[-1] == max(nlistP[-3:]):
+                                if nlistP[-1] < 0:
+                                    # 2016-03-02 ARANK
+                                    sig, state = sval, 1
+                elif prevtopM:
+                    if newhighP:
+                        if nlistM[-1] >= 5:
+                            if nlistP[-1] == max(nlistP[-3:]):
+                                if nlistP[-1] < 0:
+                                    # 2018-10-02 ARANK
+                                    sig, state = -sval, 10
+                return sig, state
+
+            def evalHighTopP(sval):
+                sig, state = 0, 0
+                if newhighM or topM:
+                    pass
+                elif prevtopM:
+                    pass
+                elif bottomM:
+                    pass
+                elif prevtopP:
+                    pass
+                elif bottomP:
+                    pass
+                elif isprev3topM():
+                    if isprev3bottomP():
+                        if max(nlistM[-3:]) >= 5:
+                            if nlistP[-1] >= 0:
+                                # 2012-12-24 DUFU
+                                sig, state = -sval, 1
+                return sig, state
+
+            sig, state = 0, 0
+            if newhighM:
+                sig, state = evalHighTopM(sval + 1)
+            elif newlowP or bottomP:
+                sig, state = evalLowBottomP(sval + 2)
+            elif bottomM:
+                sig, state = evalLowBottomM(sval + 3)
+            elif newhighP or topP:
+                sig, state = evalHighTopP(sval + 4)
+            elif prevtopP:
+                if max(plistM[-3:]) < 10:
+                    if min(nlistM[-3:]) > 5:
+                        if nlistP[-1] >= 0:
+                            # 2012-01-03 DUFU
+                            sig, state = -sval, 1
             return sig, state
 
         def evalPrevtopV():
@@ -4894,14 +5151,26 @@ def extractSignals(counter, sdict, xpn):
             # if newhighC:
             if newhighP:
                 if bottomM and not newhighM:
-                    # 2015-02-04 DUFU
-                    sig, state = -sval, 1
+                    if plistM[-1] == min(plistM[-3:]) or min(nlistP[-3:]) >= 0:
+                        # 2015-02-04 DUFU
+                        sig, state = -sval, 1
+                    else:
+                        # 2016-01-12 ARANK
+                        sig, state = sval, -1
+            elif newhighM:
+                if bottomM:
+                    if plistM[-1] < plistM[-2]:
+                        if plistM[-2] < 10:
+                            if nlistM[-1] < 5:
+                                if nlistP[-1] >= 0:
+                                    # 2017-01-06 ARANK
+                                    sig, state = sval, 5
             elif bottomM:
                 if prevtopP:
                     if pvalley and nlistP[-1] == min(nlistP[-3:]):
                         if nlistV[-1] == max(nlistV[-3:]):
                             # 2016-04-07 DUFU
-                            sig, state = sval, 1
+                            sig, state = sval, 10
             return sig, state
 
         def evalPrevbottomV():
@@ -4911,12 +5180,27 @@ def extractSignals(counter, sdict, xpn):
                     if ppeak and plistP[-2] == max(plistP):
                         # 2016-07-12 DUFU
                         sig, state = -sval, 1
+            elif newlowM:
+                if prevbottomM:
+                    if max(plistM[-3:]) >= 10:
+                        if nlistM[-1] >= 5:
+                            if plenP > 2 and plistP[-2] == max(plistP[-3:]):
+                                if nlistP[-1] == max(nlistP[-3:]):
+                                    if nlistP[-1] < 0:
+                                        # 2016-04-01 ARANK
+                                        sig, state = sval, 3
             elif plenV > 1 and plistV[-2] == max(plistV):
                 if plenP > 1 and plistP[-2] == max(plistP):
                     if nlenP > 2 and nlistP[-2] == max(nlistP[-3:]):
                         if mpeak and ppeak:
                             # 2017-06-05 DUFU
-                            sig, state = -sval, 2
+                            sig, state = -sval, 5
+                    elif nlistP[-1] == max(nlistP[-3:]):
+                        if bottomM:
+                            if nlistM[-1] >= 5:
+                                if nlistP[-1] >= 0:
+                                    # 2014-09-03 ARANK
+                                    sig, state = -sval, 8
             elif plistV[-1] < 0:
                 if nlistM[-1] < 5 and nlistP[-1] < 0:
                     if bottomM and bottomP:
@@ -4930,13 +5214,13 @@ def extractSignals(counter, sdict, xpn):
                         sig, state = sval, 15
             return sig, state
 
-        def evalOthers():
-            sig, state = 0, 0
-            if plenV > 1 and plistV[-2] == max(plistV):
+        def evalOtherVs():
+            def evalP2Max(sval):
+                sig, state = 0, 0
                 if newlowP:
                     if topP:
                         if prevbottomM:
-                            if nlistM[-1] > 5:
+                            if nlistM[-1] >= 5:
                                 # 2015-03-02 DUFU (may not need this)
                                 sig, state = sval, 1
                 elif newlowM:
@@ -4961,20 +5245,48 @@ def extractSignals(counter, sdict, xpn):
                         else:
                             # 2018-12-03 DUFU
                             sig, state = -sval, 15
-            elif nlenV > 1 and nlistV[-2] == min(nlistV):
+                elif prevbottomM:
+                    if max(plistM[-3:]) < 10:
+                        if nlistM[-1] < 5:
+                            if nlistP[-1] >= 0:
+                                # 2017-02-03 ARANK
+                                sig, state = -sval, 20
+                return sig, state
+
+            def evalN2Min(sval):
+                sig, state = 0, 0
                 if plistV[-1] < 0:
-                    if nlistM[-2] == min(nlistM) and nlistM[-1] > 5:
+                    if nlistM[-2] == min(nlistM) and nlistM[-1] >= 5:
                         if nlistP[-2] == min(nlistP):
                             if prevtopC:
                                 # 2015-09-02 DUFU
-                                sig, state = sval, 20
+                                sig, state = sval, 1
                     elif nlistM[-3] == min(nlistM) and nlistM[-1] == max(nlistM[-3:]):
                         if nlistP[-3] == min(nlistP) and nlistP[-1] == max(nlistP[-3:]):
                             if prevtopC and newhighC:
                                 if newhighM:
                                     if newhighP:
                                         # 2015-12-11 DUFU
-                                        sig, state = sval, 30
+                                        sig, state = sval, 5
+                elif nlistV[-1] > 0:
+                    if newlowM:
+                        if newlowP:
+                            if max(plistM[-3:]) >= 10:
+                                if plistM[-1] == min(plistM[-3:]):
+                                    if nlistM[-1] > min(nlistM[-3:]):
+                                        if nlistM[-1] >= 5:
+                                            if plistP[-1] == min(plistP[-3:]):
+                                                if nlistP[-1] > min(nlistP[-3:]):
+                                                    if nlistP[-1] >= 0:
+                                                        # 2016-09-02 ARANK
+                                                        sig, state = sval, 10
+                return sig, state
+
+            sig, state = 0, 0
+            if plenV > 1 and plistV[-2] == max(plistV):
+                sig, state = evalP2Max(sval + 1)
+            elif nlenV > 1 and nlistV[-2] == min(nlistV):
+                sig, state = evalN2Min(sval + 2)
             elif plenV > 2 and plistV[-1] == max(plistV[-3:]):
                 if bottomM:
                     if bottomP:
@@ -4982,30 +5294,43 @@ def extractSignals(counter, sdict, xpn):
                             if plistM[-1] == max(plistM[-3:]):
                                 if plistP[-1] == min(plistP[-3:]):
                                     # 2018-01-03 DUFU
-                                    sig, state = -sval, 40
+                                    sig, state = -sval, 1
+            if not sig:
+                if plenV > 2 and (plistV[-1] == min(plistV[-3:]) or
+                                  plistV[-2] == min(plistV[-3:])):
+                    if pvalley and plistV[-1] < 0 or plistV[-2] < 0:
+                        if prevtopM:
+                            if max(plistM[-3:]) < 10:
+                                if nlistM[-1] >= 5:
+                                    if plistP[-1] == min(plistP[-3:]):
+                                        if nlistP[-1] == max(nlistP[-3:]):
+                                            if nlistP[-1] >= 0:
+                                                # 2016-11-21 DUFU
+                                                sig, state = sval, 5
             return sig, state
 
         sig, state = 0, 0
         if newhighV:
+            sval = 10
             sig, state = evalHighV()
         elif newlowV:
-            sval += 1
+            sval = 20
             sig, state = evalLowV()
         elif topV:
-            sval += 2
+            sval = 30
             sig, state = evalTopV()
         elif bottomV:
-            sval += 3
+            sval = 40
             sig, state = evalBottomV()
         elif prevtopV:
-            sval += 4
+            sval = 50
             sig, state = evalPrevtopV()
         elif prevbottomV:
-            sval += 5
+            sval = 60
             sig, state = evalPrevbottomV()
         else:
-            sval += 8
-            sig, state = evalOthers()
+            sval = 70
+            sig, state = evalOtherVs()
         return sig, state
 
     lastTrxn, cmpvlists, composelist, hstlist, div = \
