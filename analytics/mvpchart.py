@@ -10,7 +10,7 @@ Options:
     -m,--pmaps              pattern maps (not to be used with -s option) [default: False]
     -o,--ohlc               OHLC chart (not to be used with -s option) [default: False]
     -C,--concurrency        Concurrency On/Off (use when debugging) [default: False]
-    -c,--chartdays=<cd>     Days to display on chart [default: 600]
+    -c,--chartdays=<cd>     Days to display on chart [default: 300]
     -d,--displaychart       Display chart [default: False]
     -D,--debug=(dbgopt)     Enable debug mode (A)ll, (p)attern charting, (s)ignal, (u)nit test input generation
     -e,--datadir=<dd>       Use data directory provided
@@ -39,9 +39,6 @@ from mpl_finance import candlestick_ohlc
 from multiprocessing import Process, cpu_count
 from pandas import read_csv, Grouper, concat
 from peakutils import peak
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import PolynomialFeatures
 from utils.dateutils import getDaysBtwnDates, pdTimestamp2strdate, pdDaysOffset,\
     weekFormatter, getDayOffset, mdateconvert, getBusDaysBtwnDates, datestr2float, float2datestr
 from utils.fileutils import cd, tail2, wc_line_count, grepN, mergefiles,\
