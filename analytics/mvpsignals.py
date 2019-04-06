@@ -5210,7 +5210,6 @@ def extractSignals(counter, sdict, xpn):
                             if min(nlistM[-3:]) >= 5:
                                 # 2016-07-08 PADINI
                                 sig, state = sval, 60
-                        
                 return sig, state
 
             def evalHighTopM(sval):
@@ -5435,7 +5434,7 @@ def extractSignals(counter, sdict, xpn):
                     elif plistP[-2] == max(plistP[-3:]):
                         if plistM[-2] == max(plistM[-3:]):
                             if nlistP[-3] == min(nlistP[-3:]) and \
-                                nlistM[-3] == min(nlistM[-3:]):
+                                    nlistM[-3] == min(nlistM[-3:]):
                                 # 2012-06-01 PADINI
                                 sig, state = sval, 25
                             elif min(nlistP[-3:]) >= 0:
@@ -5443,7 +5442,7 @@ def extractSignals(counter, sdict, xpn):
                                 sig, state = sval, 27
                         elif nlistP[-1] == max(nlistP[-3:]) or min(plistP[-3:]) < 0:
                             # 2017-07-03 PADINI
-                            sig ,state = sval, 29
+                            sig, state = sval, 29
                 elif min(nlistP[-3:]) >= 0:
                     if nlistM[-1] >= 5:
                         # 2013-10-01 CRESBLD
@@ -5905,7 +5904,7 @@ def extractSignals(counter, sdict, xpn):
                         if plistP[-2] == max(plistP[-3:]):
                             if plistM[-2] == max(plistM[-3:]):
                                 if nlistP[-3] == min(nlistP[-3:]) and \
-                                    nlistM[-3] == min(nlistM[-3:]):
+                                        nlistM[-3] == min(nlistM[-3:]):
                                     if nlistP[-1] >= 0:
                                         # 2012-06-01 PADINI (in newlowV)
                                         sig, state = sval, 1
@@ -6028,7 +6027,6 @@ def extractSignals(counter, sdict, xpn):
                             else:
                                 # 2016-07-12 PADINI
                                 sig, state = sval, 12
-                                
             if not (sig or state):
                 if prevbottomM:
                     if isprev3bottomP():
@@ -6793,7 +6791,6 @@ if __name__ == '__main__':
 
     def loadargs():
         klse = "scrapers/i3investor/klse.txt"
-        tmpdir = "data"
         if args['--datadir']:
             S.DATA_DIR = args['--datadir']
             if not S.DATA_DIR.endswith("/"):
@@ -6817,7 +6814,7 @@ if __name__ == '__main__':
                         stocklist[stock] = 0
         else:
             stocklist = loadKlseCounters(klse)
-        return stocklist, tmpdir, S.MVP_CHART_DAYS, args['--simulation'], dbg
+        return stocklist, S.MVP_CHART_DAYS, args['--simulation'], dbg
 
     def plot(scode, showchart):
         lsttxn = sdict['lsttxn']
@@ -6853,15 +6850,15 @@ if __name__ == '__main__':
 
     args = docopt(__doc__)
     cfg = loadCfg(S.DATA_DIR)
-    stocklist, tmpdir, chartDays, simulation, dbg = loadargs()
-    mpvdir = os.path.join(tmpdir, "mpv", '')
+    stocklist, chartDays, simulation, dbg = loadargs()
+    mpvdir = os.path.join(S.DATA_DIR, "mpv", '')
     for counter in sorted(stocklist.iterkeys()):
         if counter in S.EXCLUDE_LIST:
             print "INF:Skip: ", counter
             continue
         try:
             if simulation is None:
-                dates = jsonLastDate(counter, tmpdir)
+                dates = jsonLastDate(counter, S.DATA_DIR)
                 dates = [dates]
             else:
                 nums = simulation.split(",") if "," in simulation else numsFromDate(counter, simulation, chartDays)
@@ -6876,7 +6873,7 @@ if __name__ == '__main__':
                 step = 1
             while True:
                 start = pdDaysOffset(end, chartDays * -1)
-                sdict = loadfromjson(tmpdir, counter, end)
+                sdict = loadfromjson(S.DATA_DIR, counter, end)
                 if sdict is None:
                     print "Not a trading day:", end
                 else:
