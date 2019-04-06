@@ -17,7 +17,7 @@ def setup_module():
 
 
 def loadjson(counter, cdate):
-    sdict = loadfromjson('data', counter, cdate)
+    sdict = loadfromjson(S.DATA_DIR, counter, cdate)
     return sdict
 
 
@@ -754,6 +754,7 @@ def test_extremes_success(counter, tdate, expected):
     ("PADINI", "2017-07-03", "PADINI,BBS,20.29,0.0.0.0,(c3.m2.p2.v0),(2.0.0.3^1.0.8^0.0.0^0.0.0),(0.0.0^0.1.0),3.49"),
     ("PADINI", "2017-10-03", "PADINI,BBS,20.23,0.0.0.0,(c4.m2.p2.v0),(1.0.0.3^7.4.0^0.0.0^0.0.0),(0.0.0^0.1.0),4.48"),
     ("PADINI", "2018-01-03", "PADINI,TSS,-20.23,0.0.0.0,(c3.m2.p1.v0),(2.0.0.3^7.4.0^0.0.0^3.0.0),(0.0.0^0.1.0),5.31"),
+    ("PADINI", "2018-03-02", "PADINI,TSS,-11.15,0.0.0.0,(c3.m0.p1.v4),(2.3.4.1^0.4.8^0.0.0^0.0.0),(0.0.0^0.2.0),5.07"),
 ])
 @pytest.mark.vol
 def test_vol_success(counter, tdate, expected):
