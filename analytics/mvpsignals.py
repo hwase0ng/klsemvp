@@ -4732,12 +4732,16 @@ def extractSignals(counter, sdict, xpn):
                                 if plistP[-1] == min(plistP[-3:]):
                                     if nlistP[-1] < 0:
                                         if plistP[-1] < 0:
-                                            # 2017-12-07 DUFU plistP[-1] < 0, prevbottomM, newlowM
-                                            # 2017-12-20 DUFU plistP[-1] < 0
-                                            sig, state = -sval, 18
+                                            if newlowP:
+                                                # 2017-12-07 DUFU plistP[-1] < 0, prevbottomM, newlowM
+                                                # 2017-12-20 DUFU plistP[-1] < 0
+                                                sig, state = -sval, 18
+                                            else:
+                                                # 2016-04-07 PENTA
+                                                sig, state = sval, 18
                                         else:
                                             # 2013-02-18 CARLSBG
-                                            sig, state = sval, 18
+                                            sig, state = sval, 20
                                     else:
                                         sig, state = sval, 998
                 if not (sig and state):
@@ -4747,13 +4751,13 @@ def extractSignals(counter, sdict, xpn):
                                 if prevtopM:
                                     if plistM[-1] < 10:
                                         # 2015-11-30 CRESBLD
-                                        sig, state = -sval, 20
+                                        sig, state = -sval, 30
                                     else:
                                         sig, state = sval, 997
                             elif plistM[-1] == min(plistM[-3:]):
                                 if max(nlistP[-3:]) < 0:
                                     # 2014-03-13 PADINI
-                                    sig, state = -sval, -20
+                                    sig, state = -sval, -30
                                 else:
                                     sig, state = sval, 996
                 if not (sig and state):
@@ -4762,17 +4766,21 @@ def extractSignals(counter, sdict, xpn):
                             if nlistP[-1] == max(nlistP[-3:]):
                                 if nlistP[-1] < 0:
                                     # 2016-05-09 ARANK newhighM, prevtopP
-                                    sig, state = sval, 30
+                                    sig, state = sval, 40
                                 elif bottomM:
                                     if plistM[-1] < 10:
                                         # 2017-08-02 CARIMIN
-                                        sig, state = sval, -35
+                                        sig, state = sval, -45
                                     elif isprev3topP():
-                                        # 2017-05-02 CARIMIN
-                                        sig, state = -sval, 35
+                                        if plistP[-1] == max(plistP[-3:]):
+                                            # 2013-03-08 PENTA
+                                            sig, state = sval, 45
+                                        else:
+                                            # 2017-05-02 CARIMIN
+                                            sig, state = -sval, 45
                                     else:
                                         # 2010-09-02 CARLSBG
-                                        sig, state = sval, 35
+                                        sig, state = sval, 46
                                 elif topP:
                                     # 2019-03-01 CARIMIN
                                     pass
@@ -4884,6 +4892,7 @@ def extractSignals(counter, sdict, xpn):
                                 if nlistP[-1] >= 0:
                                     if prevtopM or plistM[-1] >= 10:
                                         if topM and topP:
+                                            # 2014-06-03 PENTA
                                             # 2017-03-31 CARIMIN
                                             sig, state = -sval, 21
                                         else:
@@ -4958,12 +4967,16 @@ def extractSignals(counter, sdict, xpn):
                                         sig, state = sval, 9
                                     else:
                                         sig, state = -sval, 997
-                                else:
+                                elif firstP < min(nlistP):
                                     # 2014-04-04 ARANK chartdays=300
                                     sig, state = sval, 10
+                                elif plistP[-2] >= 0:
+                                    if plistP[-2] == max(plistP[-3:]):
+                                        # 2013-10-08 PENTA
+                                        sig, state = -sval, 10
                             else:
                                 # 2014-12-02 DUFU
-                                sig, state = -sval, 10
+                                sig, state = -sval, 11
                     elif min(nlistM[-3:]) >= 5:
                         if plistP[-1] == min(plistP[-3:]):
                             if prevbottomP:
@@ -4971,10 +4984,10 @@ def extractSignals(counter, sdict, xpn):
                                     if nlistP[-1] < 0:
                                         if plistM[-1] == max(plistM[-3:]):
                                             # 2018-04-03 ARANK
-                                            sig, state = -sval, -10
+                                            sig, state = -sval, -15
                                         else:
                                             # 2016-12-05 PADINI
-                                            sig, state = sval, -10
+                                            sig, state = sval, -15
                                     else:
                                         sig, state = -sval, 996
                 return sig, state
@@ -5031,8 +5044,12 @@ def extractSignals(counter, sdict, xpn):
                                 if nlistP[-1] == max(nlistP[-3:]):
                                     if nlistP[-1] >= 0:
                                         if plistM[-1] == min(plistM[-3:]):
-                                            # 2018-12-18 DANCO
-                                            sig, state = sval, -1
+                                            if min(nlistP[-3:]) >= 0:
+                                                # 2013-08-21 PENTA
+                                                sig, state = -sval, 1
+                                            else:
+                                                # 2018-12-18 DANCO
+                                                sig, state = sval, -1
                                         else:
                                             # 2018-12-24 DANCO
                                             sig, state = sval, 1
@@ -5252,8 +5269,12 @@ def extractSignals(counter, sdict, xpn):
                                 sig, state = sval, 1
                             elif min(nlistP[-3:]) >= 0:
                                 if prevbottomM:
-                                    # 2017-10-09 CARIMIN
-                                    sig, state = -sval, 1
+                                    if plistM[-1] == min(plistM[-3:]):
+                                        # 2013-07-02 PENTA topP
+                                        sig, state = -sval, 1
+                                    else:
+                                        # 2017-10-09 CARIMIN
+                                        sig, state = -sval, 1
                                 elif newhighM:
                                     # 2013-12-31 DUFU
                                     sig, state = -sval, 2
@@ -5310,8 +5331,12 @@ def extractSignals(counter, sdict, xpn):
                                     # 2015-03-04 DUFU
                                     sig, state = sval, 30
                                 elif topM:
-                                    # 2018-08-01 PADINI
-                                    sig, state = -sval, 30
+                                    if newlowM:
+                                        # 2017-05-02 PENTA
+                                        sig, state = sval, 31
+                                    else:
+                                        # 2018-08-01 PADINI
+                                        sig, state = -sval, 31
                                 else:
                                     # 2015-03-16 DUFU
                                     # 2016-02-03 ARANK topV
@@ -5354,13 +5379,21 @@ def extractSignals(counter, sdict, xpn):
                     if nlistM[-1] == min(nlistM[-3:]):
                         if nlistM[-1] >= 5:
                             if nlistP[-1] >= 0:
-                                # 2012-08-01 CRESBLD
-                                sig, state = -sval, 70
+                                if plistM[-1] < 10:
+                                    # 2012-08-01 CRESBLD
+                                    sig, state = -sval, 70
+                                else:
+                                    # 2014-07-01 PENTA
+                                    sig, state = sval, -70
                     elif nlistM[-1] == max(nlistM[-3:]):
                         if nlistP[-1] == max(nlistP[-3:]):
                             if max(plistM[-3:]) < 10:
-                                # 2012-04-06 PADINI topC, topV
-                                sig, state = sval, 73
+                                if topM:
+                                    # 2018-12-13 PENTA
+                                    sig, state = sval, -73
+                                else:
+                                    # 2012-04-06 PADINI topC, topV
+                                    sig, state = sval, 73
                             else:
                                 if min(plistM[-3:]) >= 10 or nlistM[-1] >= 10:
                                     # 2014-06-09 DUFU bottomC
@@ -5386,6 +5419,12 @@ def extractSignals(counter, sdict, xpn):
                                 sig, state = -sval, 78
                             else:
                                 sig, state = -sval, 994
+                        elif nlistP[-1] == min(nlistP[-3:]):
+                            if prevbottomP:
+                                # 2016-09-02 PENTA
+                                sig, state = sval, 76
+                            else:
+                                sig, state = sval, -994
                         else:
                             sig, state = sval, 994
                 return sig, state
@@ -5425,9 +5464,18 @@ def extractSignals(counter, sdict, xpn):
                                         sig, state = -sval, 6
                                     else:
                                         sig, state = sval, -998
+                                elif nlistP[-1] < 0:
+                                    if nlistM[-1] >= 5:
+                                        # 2015-01-05 PENTA
+                                        sig, state = sval, 6
+                                    else:
+                                        # 2015-08-05 DUFU bottomP
+                                        sig, state = sval, -6
                                 else:
-                                    # 2015-08-05 DUFU bottomP
-                                    sig, state = sval, -6
+                                    if nlistM[-1] >= 5:
+                                        sig, state = sval, 997
+                                    else:
+                                        sig, state = sval, -997
                             elif prevbottomM:
                                 if nlistP[-1] >= 0:
                                     sig, state = -sval, 998
@@ -5481,8 +5529,13 @@ def extractSignals(counter, sdict, xpn):
                     if prevbottomM:
                         if isprev3topP():
                             if plistP[-1] < plistP[-2]:
-                                # 2015-05-05 DUFU
-                                sig, state = -sval, 20
+                                if plistM[-1] < 10:
+                                    if plistM[-1] == min(plistM[-3:]):
+                                        # 2014-12-12 PENTA
+                                        sig, state = sval, 20
+                                else:
+                                    # 2015-05-05 DUFU
+                                    sig, state = -sval, 20
                             elif nlistM[-1] >= 5:
                                 if nlistP[-1] >= 0:
                                     # 2014-10-01 ARANK
@@ -5503,7 +5556,11 @@ def extractSignals(counter, sdict, xpn):
                         if nlistP[-1] < 0:
                             if max(plistM[-3:]) >= 10:
                                 if min(nlistM[-3:]) >= 5:
-                                    sig, state = -sval, 40
+                                    if topP:
+                                        # 2017-07-03 PENTA
+                                        sig, state = sval, 40
+                                    else:
+                                        sig, state = sval, -991
                                 else:
                                     sig, state = sval, 991
                             elif plistM[-1] == min(plistM[-3:]):
@@ -5511,6 +5568,9 @@ def extractSignals(counter, sdict, xpn):
                                 sig, state = -sval, 45
                             elif plistP[-1] == min(plistP[-3:]):
                                 sig, state = sval, -990
+                            elif plistP[-1] == max(plistP[-3:]):
+                                # 2015-03-02 PENTA
+                                sig, state = sval, 45
                             else:
                                 sig, state = sval, 990
                 if not (sig and state):
@@ -5523,6 +5583,7 @@ def extractSignals(counter, sdict, xpn):
                         if plistM[-1] == min(plistM[-3:]):
                             if nlistM[-1] < 5:
                                 if nlistP[-1] >= 0:
+                                    # 2017-10-03 PENTA
                                     # 2019-01-03 CRESBLD
                                     sig, state = sval, 70
                                 else:
@@ -5597,7 +5658,8 @@ def extractSignals(counter, sdict, xpn):
                                     # 2014-12-01 CRESBLD
                                     sig, state = -sval, 7
                                 else:
-                                    sig, state = sval, 997
+                                    # 2013-11-07 PENTA
+                                    sig, state = -sval, 997
                 if not (sig and state):
                     if max(plistM[-3:]) < 10:
                         if nlistM[-2] == min(nlistM):
@@ -5605,6 +5667,12 @@ def extractSignals(counter, sdict, xpn):
                                 if nlistP[-1] >= 0:
                                     # 2016-10-04 DUFU
                                     sig, state = sval, 10
+                                elif plistM[-1] == max(plistM[-3:]):
+                                    if nlistM[-1] == max(nlistM[-3:]):
+                                        # 2018-07-04 PENTA
+                                        sig, state = sval, 11
+                                    else:
+                                        sig, state = sval, -997
                                 else:
                                     sig, state = -sval, 996
                         elif nlistM[-1] == min(nlistM[-3:]):
@@ -5804,12 +5872,14 @@ def extractSignals(counter, sdict, xpn):
                                     else:
                                         sig, state = sval, 999
                                 else:
-                                    sig, state = -sval, 999
+                                    # 2017-09-05 PENTA
+                                    sig, state = -sval, 0
                         elif nlistP[-1] >= 0:
                             if nlistP[-2] == min(nlistP):
                                 if newlowP:
                                     if plistM[-1] < 10:
                                         # 2012-06-01 CARLSBG
+                                        # 2016-12-09 PENTA
                                         sig, state = sval, 2
                                 elif isprev3bottomM():
                                     if plistM[-1] < 10:
@@ -5818,6 +5888,9 @@ def extractSignals(counter, sdict, xpn):
                                     else:
                                         # 2011-01-04 CARLSBG
                                         sig, state = sval, -2
+                                elif plistP[-3] < 0:
+                                    # 2016-11-01 PENTA
+                                    sig, state = sval, -3
                                 else:
                                     # 2009-07-01 CARLSBG
                                     sig, state = sval, 3
@@ -5859,6 +5932,9 @@ def extractSignals(counter, sdict, xpn):
                                 else:
                                     # 2015-08-03 PADINI
                                     sig, state = sval, 15
+                            elif plistP[-1] < 0:
+                                # 2016-05-03 PENTA bottomP, newhighM
+                                sig, state = sval, 16
                             else:
                                 # 2014-03-17 CARLSBG
                                 sig, state = -sval, 16
@@ -5892,42 +5968,51 @@ def extractSignals(counter, sdict, xpn):
                                 if nlistM[-1] == max(nlistM[-3:]):
                                     # 2017-10-03 PADINI
                                     sig, state = sval, 33
+                                elif nlistM[-1] == min(nlistM[-3:]):
+                                    if plistP[-1] == min(plistP[-3:]):
+                                        if bottomM:
+                                            # 2015-09-02 PENTA
+                                            sig, state = sval, 34
+                                        else:
+                                            sig, state = sval, -994
+                                    else:
+                                        sig, state = -sval, 994
                                 else:
-                                    sig, state = -sval, 994
+                                    sig, state = sval, 994
                         elif plistM[-1] == min(plistM[-3:]):
                             if nlistM[-1] == max(nlistM[-3:]):
                                 if nlistP[-1] == min(nlistP[-3:]):
                                     # 2014-05-19 CRESBLD
-                                    sig, state = sval, -33
+                                    sig, state = sval, -34
                                 else:
                                     # if nlistP[-2] == min(nlistP[-3:]):
                                     # 2018-01-03 PADINI
-                                    sig, state = -sval, 33
+                                    sig, state = -sval, 34
                             elif nlistM[-1] == min(nlistM[-3:]):
                                 if min(nlistP[-3:]) >= 0:
                                     if mvalley and pvalley:
                                         # 2013-10-03 CRESBLD
-                                        sig, state = sval, 34
+                                        sig, state = sval, 45
                                     else:
                                         sig, state = sval, -993
                             else:
                                 # 2009-12-02 CARLSBG
                                 # 2010-02-02 CARLSBG
-                                sig, state = sval, 35
+                                sig, state = sval, 45
                     elif plistP[-2] == max(plistP[-3:]):
                         if plistM[-2] == max(plistM[-3:]):
                             if nlistP[-3] == min(nlistP[-3:]) and \
                                     nlistM[-3] == min(nlistM[-3:]):
                                 # 2012-06-01 PADINI
-                                sig, state = sval, 36
+                                sig, state = sval, 46
                             elif min(nlistP[-3:]) >= 0:
                                 # 2012-07-03 PADINI
-                                sig, state = sval, 37
+                                sig, state = sval, 47
                             else:
                                 sig, state = -sval, 992
                         elif nlistP[-1] == max(nlistP[-3:]) or min(plistP[-3:]) < 0:
                             # 2017-07-03 PADINI
-                            sig, state = sval, 39
+                            sig, state = sval, 49
                         elif nlistP[-1] < 0:
                             if newhighM:
                                 # 2012-04-04 DUFU
@@ -5950,6 +6035,9 @@ def extractSignals(counter, sdict, xpn):
                             # 2014-10-01 PADINI
                             # 2014-12-10 PADINI
                             sig, state = -sval, 65
+                        elif plistP[-1] < 0:
+                            # 2016-04-01 PENTA
+                            sig, state = sval, 65
                         else:
                             sig, state = sval, 989
                 return sig, state
@@ -6036,16 +6124,23 @@ def extractSignals(counter, sdict, xpn):
                                     else:
                                         # 2014-04-08 PADINI topM, topP
                                         sig, state = -sval, 13
+                                elif nlistP[-1] >= 0:
+                                    if newlowP:
+                                        if nlistM[-1] < 5:
+                                            # 2019-01-02 PENTA
+                                            sig, state = sval, 14
+                                        else:
+                                            sig, state = sval, -997
                                 else:
                                     sig, state = sval, 997
                             elif min(nlistM[-3:]) >= 5:
                                 if nlistP[-1] == max(nlistP[-3:]):
                                     if nlistP[-1] < 0:
                                         # 2018-10-23 DANCO
-                                        sig, state = sval, 14
+                                        sig, state = sval, 15
                                     else:
                                         # 2019-02-07 CARIMIN
-                                        sig, state = sval, -14
+                                        sig, state = sval, -15
                 if not (sig and state):
                     if newlowP or bottomP:
                         if prevtopM:
@@ -6054,10 +6149,10 @@ def extractSignals(counter, sdict, xpn):
                                     if nlistP[-1] == max(nlistP[-3:]):
                                         if nlistM[-1] == min(nlistM[-3:]):
                                             # 2012-05-04 ARANK
-                                            sig, state = sval, -15
+                                            sig, state = sval, -16
                                         else:
                                             # 2018-11-02 DANCO
-                                            sig, state = sval, 15
+                                            sig, state = sval, 16
                                     elif nlistM[-1] == min(nlistM[-3:]):
                                         # 2012-05-04 ARANK
                                         sig, state = sval, -17
@@ -6126,6 +6221,7 @@ def extractSignals(counter, sdict, xpn):
                                     # 2012-01-05 CARLSBG
                                     sig, state = sval, 2
                                 else:
+                                    # 2013-11-01 PENTA
                                     # 2012-06-01 DUFU
                                     sig, state = -sval, 2
                             else:
@@ -6173,11 +6269,14 @@ def extractSignals(counter, sdict, xpn):
                                 if nlistP[-1] > 0:
                                     if plistM[-1] < 10:
                                         if newlowM:
-                                            # 2014-12-16 DUFU
-                                            sig, state = sval, 10
+                                            # 2014-12-12 PENTA
+                                            sig, state = sval, -10
+                                        elif topP:
+                                            # 2013-07-08 PENTA
+                                            sig, state = -sval, 998
                                         else:
                                             # 2014-12-12 DUFU
-                                            sig, state = sval, -10
+                                            sig, state = sval, -11
                 if not (sig and state):
                     if plistM[-1] >= 10:
                         if min(nlistM[-3:]) >= 5:
@@ -6214,6 +6313,7 @@ def extractSignals(counter, sdict, xpn):
                             if mvalley:
                                 if plistM[-1] < 10:
                                     # 2015-01-05 DUFU
+                                    # 2015-04-01 PENTA
                                     sig, state = sval, 1
                             elif max(plistM[-3:]) <= 10:
                                 # 2016-03-09 CRESBLD
@@ -6295,8 +6395,17 @@ def extractSignals(counter, sdict, xpn):
                             if isprev3bottomP():
                                 if nlistP[-1] < 0:
                                     if mpeak and plistM[-1] == min(plistM[-3:]):
-                                        # 2014-01-22 PADINI
-                                        sig, state = sval, -20
+                                        if plistM[-1] == min(plistM[-3:]):
+                                            # 2014-01-22 PADINI
+                                            sig, state = sval, -20
+                                        else:
+                                            sig, state = sval, 999
+                                    elif plistM[-1] >= 10:
+                                        if plistP[-1] < 0:
+                                            # 2016-08-01 PENTA bottomP, prevtopM
+                                            sig, state = sval, 20
+                                        else:
+                                            sig, state = sval, -999
                                     else:
                                         # 2014-01-02 PADINI
                                         sig, state = -sval, 20
@@ -6313,6 +6422,7 @@ def extractSignals(counter, sdict, xpn):
                                             sig, state = sval, -30
                                     elif min(nlistM) >= 5:
                                         if plistP[-1] == min(plistP[-3:]) or newhighM:
+                                            # 2015-02-24 PENTA
                                             # 2017-03-09 PADINI bottomP, plistP[-1]<0
                                             # 2018-06-04 PADINI
                                             sig, state = sval, 35
@@ -6322,9 +6432,15 @@ def extractSignals(counter, sdict, xpn):
                                     elif nlistM[-1] < 5:
                                         if plistP[-1] < 0:
                                             sig, state = -sval, 998
-                                        else:
+                                        elif max(nlistP[-3:]) < 0:
                                             # 2013-03-04 CARLSBG newhighM
                                             sig, state = sval, 36
+                                        else:
+                                            # 2018-03-30 PENTA
+                                            sig, state = sval, -36
+                                    elif plistP[-1] < 0:
+                                        # 2016-05-25 PENTA
+                                        sig, state = sval, 37
                                     else:
                                         # 2014-11-04 PADINI
                                         sig, state = -sval, 37
@@ -6336,11 +6452,23 @@ def extractSignals(counter, sdict, xpn):
                                 sig, state = sval, 40
                             elif prevbottomM:
                                 if min(nlistP[-3:]) > 0:
-                                    # 2017-09-07 CARIMIN
-                                    sig, state = sval, 45
+                                    if plistP[-1] == min(plistP[-3:]):
+                                        if newlowM:
+                                            # 2014-12-08 PENTA
+                                            sig, state = sval, -45
+                                        else:
+                                            # 2017-09-07 CARIMIN
+                                            sig, state = sval, 45
+                                    elif plistP[-1] == max(plistP[-3:]):
+                                        # 2013-06-04 PENTA
+                                        sig, state = -sval, 45
                             elif bottomM:
-                                # 2017-09-15 CARIMIN
-                                sig, state = sval, 47
+                                if nlistP[-1] == max(nlistP[-3:]):
+                                    # 2017-09-15 CARIMIN
+                                    sig, state = sval, 47
+                                else:
+                                    # 2014-11-24 PENTA
+                                    sig, state = sval, -48
                             else:
                                 sig, state = -sval, 997
                 return sig, state
@@ -6435,12 +6563,19 @@ def extractSignals(counter, sdict, xpn):
                         if min(nlistM[-3:]) >= 5:
                             if min(nlistP[-3:]) >= 0:
                                 # 2015-06-16 DUFU
-                                sig, state = -sval, 30
+                                sig, state = -sval, 29
                             elif nlistP[-1] < 0:
-                                # 2015-03-19 CRESBLD plistV[-1] < 0
-                                if bottomP or prevbottomM:
-                                    # 2011-07-15 CARLSBG
-                                    sig, state = -sval, 31
+                                if bottomP or prevtopP:
+                                    if plistM[-1] == min(plistM[-3:]):
+                                        if prevbottomM:
+                                            # 2015-03-19 CRESBLD plistV[-1] < 0
+                                            sig, state = -sval, 30
+                                        else:
+                                            # 2015-01-09 PENTA
+                                            sig, state = sval, 30
+                                    else:
+                                        # 2011-07-15 CARLSBG prevtopP
+                                        sig, state = -sval, 31
                                 elif topP or bottomM:
                                     if plistP[-1] >= 0:
                                         # 2014-06-13 ARANK
@@ -6459,10 +6594,14 @@ def extractSignals(counter, sdict, xpn):
                                 # 2012-12-06 PADINI
                                 sig, state = -sval, 35
                             else:
+                                # 2015-02-04 PENTA
                                 # 2018-05-03 PADINI
                                 sig, state = sval, 35
                         else:
-                            sig, state = -sval, 997
+                            if plistP[-1] < 0:
+                                sig, state = -sval, 997
+                            else:
+                                sig, state = sval, 997
                 if not (sig and state):
                     if prevtopP:
                         if plistM[-1] < 10:
@@ -6847,12 +6986,34 @@ def extractSignals(counter, sdict, xpn):
                             else:
                                 sig, state = -sval, 999
                         elif nlistP[-1] < 0:
-                            # 2016-07-12 DUFU
-                            sig, state = -sval, 1
+                            if nlistM[-1] == max(nlistM[-3:]):
+                                # 2016-07-12 DUFU
+                                sig, state = -sval, 1
+                            elif prevtopM:
+                                # 2019-03-01 PENTA
+                                sig, state = sval, 1
+                            else:
+                                sig, state = sval, -999
                     elif topM or prevtopP:
-                        # 2014-02-25 DUFU
-                        # 2016-09-20 DUFU
-                        sig, state = sval, -3
+                        if max(plistM[-3:]) < 10:
+                            if nlistP[-1] < 0:
+                                if nlistM[-1] < 5:
+                                    # 2019-02-19 PENTA
+                                    sig, state = sval, 3
+                                else:
+                                    sig, state = sval, -998
+                            elif topM:
+                                # 2016-09-20 DUFU
+                                sig, state = sval, -3
+                            else:
+                                sig, state = -sval, 998
+                        elif plistM[-1] >= 10:
+                            if nlistP[-1] == max(nlistP[-3:]):
+                                # 2014-02-25 DUFU prevtopP
+                                sig, state = sval, -4
+                            elif nlistP[-1] == min(nlistP[-3:]):
+                                # 2016-07-04 PENTA prevbottomP
+                                sig, state = sval, 4
                     elif nlistM[-1] == max(nlistM[-3:]):
                         if nlistP[-1] == max(nlistP[-3:]):
                             sig, state = sval, 3
@@ -6861,7 +7022,7 @@ def extractSignals(counter, sdict, xpn):
                             # 2013-03-08 PADINI bottomM
                             sig, state = -sval, 3
                     else:
-                        sig, state = sval, 999
+                        sig, state = sval, 997
                 elif bottomP:
                     if nlistP[-1] >= 0:
                         if plistM[-1] < 10:
@@ -6873,7 +7034,7 @@ def extractSignals(counter, sdict, xpn):
                                     # 2014-07-02 CRESBLD
                                     sig, state = -sval, -5
                             else:
-                                sig, state = sval, 998
+                                sig, state = sval, 996
             if not (sig and state):
                 if newlowM or bottomM:
                     if prevbottomM:
@@ -6896,7 +7057,7 @@ def extractSignals(counter, sdict, xpn):
                                                 # 2012-10-01 ARANK topM
                                                 sig, state = sval, 8
                                         else:
-                                            sig, state = -sval, 997
+                                            sig, state = -sval, 995
                     elif min(nlistM[-3:]) >= 5:
                         if max(plistM[-3:]) < 10:
                             if nlistP[-1] < 0:
@@ -6904,7 +7065,7 @@ def extractSignals(counter, sdict, xpn):
                                     # 2016-06-20 PADINI
                                     sig, state = sval, 10
                                 else:
-                                    sig, state = -sval, 996
+                                    sig, state = -sval, 994
                             elif nlistP[-1] == max(nlistP[-3:]) or \
                                     max(plistM) >= 10:
                                 if plistP[-1] == min(plistP[-3:]):
@@ -6917,7 +7078,7 @@ def extractSignals(counter, sdict, xpn):
                                     # 2018-01-03 CARLSBG
                                     sig, state = sval, 12
                                 else:
-                                    sig, state = sval, 997
+                                    sig, state = sval, 993
                             elif nlistP[-1] == min(nlistP[-3:]):
                                 if nlistP[-1] >= 0:
                                     # 2014-09-10 CRESBLD
@@ -6952,8 +7113,10 @@ def extractSignals(counter, sdict, xpn):
                         if nlenP > 2 and nlistP[-2] == max(nlistP[-3:]):
                             if mpeak and ppeak:
                                 if nlistP[-1] < 0:
-                                    # 2010-06-02 PADINI newlowM
-                                    sig, state = sval, 20
+                                    if nlistM[-1] == min(nlistM[-3:]):
+                                        # 2010-06-02 PADINI newlowM
+                                        # 2019-03-25 PENTA
+                                        sig, state = sval, 20
                                 elif nlistP[-1] == min(nlistP[-3:]):
                                     # 2009-12-30 CARLSBG
                                     sig, state = sval, 21
@@ -6979,7 +7142,7 @@ def extractSignals(counter, sdict, xpn):
                                         # 2018-07-19 PECCA
                                         sig, state = -sval, 30
                                     else:
-                                        sig, state = sval, -996
+                                        sig, state = sval, -992
                                 else:
                                     # 2015-08-03 DUFU
                                     sig, state = sval, -30
@@ -6990,7 +7153,7 @@ def extractSignals(counter, sdict, xpn):
                                 # 2015-08-17 DUFU (4 months bull run)
                                 sig, state = sval, 35
                             else:
-                                sig, state = sval, 994
+                                sig, state = sval, 991
             return sig, state
 
         def evalOtherVs():
@@ -7015,8 +7178,12 @@ def extractSignals(counter, sdict, xpn):
                             if plistM[-1] == min(plistM[-3:]):
                                 if nlistP[-1] >= 0:
                                     if max(plistM[-3:]) >= 10:
-                                        # 2018-11-05 CARIMIN
-                                        sig, state = sval, 2
+                                        if plistP[-1] == max(plistP[-3:]):
+                                            # 2013-03-14 PENTA
+                                            # 2018-11-05 CARIMIN
+                                            sig, state = sval, 2
+                                        else:
+                                            sig, state = sval, -999
                 if not (sig and state):
                     if newlowM:
                         if prevbottomM:
@@ -7032,6 +7199,7 @@ def extractSignals(counter, sdict, xpn):
                                 if min(nlistM[-3:]) >= 5:
                                     if nlistP[-1] == max(nlistP[-3:]):
                                         if nlistP[-1] >= 0:
+                                            # 2014-05-02 PENTA
                                             # 2018-09-06 CARIMIN
                                             sig, state = sval, 7
                 if not (sig and state):
@@ -7102,12 +7270,23 @@ def extractSignals(counter, sdict, xpn):
                         if plenM > 2 and max(plistM[-3:]) < 10:
                             if nlistM[-1] < 5:
                                 if nlistP[-1] >= 0:
-                                    # 2013-06-04 CARLSBG
-                                    # 2017-02-03 ARANK
-                                    sig, state = -sval, 30
+                                    if topM:
+                                        if prevtopP:
+                                            # 2013-06-04 CARLSBG
+                                            sig, state = -sval, 30
+                                        else:
+                                            # 2019-04-08 PENTA
+                                            sig, state = sval, -996
+                                    elif plistP[-1] == max(plistP[-3:]):
+                                        # 2017-02-03 ARANK
+                                        sig, state = -sval, 30
                                 elif plistP[-1] == min(plistP[-3:]):
-                                    # 2014-12-04 ARANK
-                                    sig, state = -sval, 31
+                                    if plistP[-1] < 0:
+                                        # 2016-03-16 PENTA newlowM, newlowP
+                                        sig, state = sval, -31
+                                    else:
+                                        # 2014-12-04 ARANK
+                                        sig, state = -sval, 31
                                 elif prevtopP:
                                     # 2016-06-02 DUFU
                                     sig, state = sval, 32
@@ -7115,6 +7294,10 @@ def extractSignals(counter, sdict, xpn):
                                     if nlistP[-1] == max(nlistP[-3:]):
                                         # 2015-05-05 PADINI
                                         sig, state = -sval, 33
+                                elif topM:
+                                    if prevbottomP:
+                                        # 2019-04-02 PENTA
+                                        sig, state = sval, 34
                                 else:
                                     sig, state = sval, 995
                 if not (sig and state):
@@ -7123,13 +7306,15 @@ def extractSignals(counter, sdict, xpn):
                             if min(nlistM[-3:]) >= 5:
                                 if nlistP[-1] >= 0:
                                     if plistP[-1] == max(plistP[-3:]):
+                                        # 2017-08-02 PENTA
                                         # 2018-11-23 CARIMIN
-                                        sig, state = sval, 40
+                                        sig, state = sval, 39
                                     elif nlistP[-1] == max(nlistP[-3:]):
                                         if newhighM:
                                             sig, state = sval, -994
                                         elif newhighP:
                                             # 2012-11-02 ARANK
+                                            # 2014-06-27 PENTA
                                             sig, state = sval, -40
                                         elif nlistM[-1] >= 10:
                                             # 2014-03-03 DUFU nlistM[-1]>10
@@ -7274,6 +7459,7 @@ def extractSignals(counter, sdict, xpn):
                                         if nlistM[-2] == min(nlistM) and \
                                                 nlistP[-2] == min(nlistP):
                                             # 2013-03-01 CRESBLD
+                                            # 2018-06-06 PENTA
                                             sig, state = sval, 20
                                         else:
                                             sig, state = -sval, 997
@@ -7290,8 +7476,14 @@ def extractSignals(counter, sdict, xpn):
                                                 # 2011-08-22 PADINI
                                                 sig, state = sval, -30
                                             elif plistM[-1] == min(plistM[-3:]):
-                                                # 2018-05-15 CARIMIN
-                                                sig, state = -sval, 35
+                                                if min(nlistM[-3:]) >= 5:
+                                                    # 2018-05-15 CARIMIN
+                                                    sig, state = -sval, 35
+                                                elif plistP[-1] < 0:
+                                                    # 2018-05-31 PENTA
+                                                    sig, state = sval, 35
+                                                else:
+                                                    sig, state = sval, -996
                                             elif nlistM[-1] == max(nlistM[-3:]):
                                                 if nlistM[-2] < 5:
                                                     if plistP[-3] == max(plistP) and \
