@@ -52,8 +52,8 @@ import tarfile
 
 
 def dfLoadMPV(counter, chartDays, start=0, dojson=0):
-    incsv = S.DATA_DIR + S.MVP_DIR + counter + ".csv"
-    outname = "data/mpv/synopsis/" + counter
+    incsv = os.path.join(S.DATA_DIR, S.MVP_DIR, counter + ".csv")
+    outname = os.path.join(S.DATA_DIR, S.MVP_DIR, "synopsis", counter)
     if dojson == "2":
         df, skiprow = None, 0
     else:
@@ -766,7 +766,10 @@ def plotSignals(pmaps, counter, datevector, ax0):
                 symbolclr = "r."
                 fontclr = "red"
         elif int(sig) < 0:
-            if int(state) > 0:
+            if int(state) > 900 or int(state) < -900:
+                symbolclr = "mX"
+                fontclr = "black"
+            elif int(state) > 0:
                 symbolclr = "rX"
                 fontclr = "black"
             else:
@@ -774,7 +777,10 @@ def plotSignals(pmaps, counter, datevector, ax0):
                 symbolclr = "r^"
                 fontclr = "green"
         else:
-            if int(state) > 0:
+            if int(state) > 900 or int(state) < -900:
+                symbolclr = "b^"
+                fontclr = "black"
+            elif int(state) > 0:
                 symbolclr = "g^"
                 fontclr = "green"
             else:
@@ -783,7 +789,8 @@ def plotSignals(pmaps, counter, datevector, ax0):
                 fontclr = "green"
         return symbolclr, fontclr
 
-    prefix = S.DATA_DIR + S.MVP_DIR + "signals/"
+    # prefix = S.DATA_DIR + S.MVP_DIR + "signals/"
+    prefix = os.path.join(S.DATA_DIR, S.MVP_DIR, "signals", '')
     infile = prefix + counter + "-signals.csv"
     try:
         df = read_csv(infile, sep=',', header=None, parse_dates=['trxdt'],
@@ -836,7 +843,8 @@ def plotSignals(pmaps, counter, datevector, ax0):
                         strV = str(sval)
                         symbolclr, fontclr = getSymbolColor(sval, sstate)
                         ax0.plot(dt, ymin, symbolclr, markersize=7)
-                        ch = strV[0] if int(strV) < 70 else strV[1]
+                        # ch = strV[0] if int(strV) < 70 else strV[1]
+                        ch = strV[0]
                         ax0.text(dt, ymin, ch, color=fontclr, fontsize=9)
                     for i in range(0, ilen):
                         fontclr = "black" if i in [7, 8, 9] else \
@@ -1019,7 +1027,7 @@ def mvpChart(counter, scode, chartDays=S.MVP_CHART_DAYS,
 
 
 def numsFromDate(counter, datestr, cdays=S.MVP_CHART_DAYS):
-    prefix = S.DATA_DIR + S.MVP_DIR
+    prefix = os.path.join(S.DATA_DIR, S.MVP_DIR)
     incsv = prefix + counter + ".csv"
     row_count = wc_line_count(incsv)
     dates = datestr.split(":") if ":" in datestr else [datestr]
@@ -1533,7 +1541,7 @@ def doPlotting(datadir, dbg, dfplot, dojson, showchart,
         # columns, rows
         figsize = (12, 7) if showchart else (10, 6)
     else:
-        figsize = (10, 6) if showchart else (9, 5)
+        figsize = (9, 5) if showchart else (9, 5)
     if dojson == "2":
         fig, axes = plt.subplots(4, ncols, figsize=figsize, sharex=False, num=plttitle)
         jsonPlotSynopsis(axes, lsttxn, sdict['pnlist'])
@@ -1563,7 +1571,7 @@ def doPlotting(datadir, dbg, dfplot, dojson, showchart,
             title = plttitle + " [" + signals + "]"
         else:
             title = plttitle + " [" + counter + "]"
-        fsize = 10 if showchart else 9
+        fsize = 8 if showchart else 9
         fig.canvas.set_window_title(plttitle)
         fig.suptitle(title, fontsize=fsize)
         if dbg:
